@@ -3,6 +3,5 @@
 *test.for
 
 # ignore ALL files in ANY directory named data
-data/
-**/data
+/data/*
 !data/sample.for
