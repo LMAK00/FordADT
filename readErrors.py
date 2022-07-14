@@ -15,16 +15,16 @@ def buildTxtFile(fileText, fileLocation):
     # initTime = time.time()
     for filename in glob.iglob(fileLocation + "*.f*"):
         if filename.endswith('.f') or filename.endswith('.for') or filename.endswith('.f90'):
-            findError6186(filename, fileText)
-            findError6222(filename, fileText)
-            findError6278(filename, fileText)
-            findError6418(filename, fileText)
+            # findError6186(filename, fileText)
+            # findError6222(filename, fileText)
+            # findError6278(filename, fileText)
+            # findError6418(filename, fileText)
             if not filename.endswith('*.f') and not '.f90' in filename:
                 findError6404(filename, fileText, fileLocation)
 
             # TESTING SINGLE FILES
-            # if not filename.endswith('*.f') and 'dgen.f' in filename:
-                # findError6404(filename, fileText, fileLocation)
+            # if 'readdsa.f' in filename:
+            #     findError6404(filename, fileText, fileLocation)
                 # findError6186(filename, fileText)
     # print("Time taken by functions: " + str(time.time()- initTime) +"s")
     F.close()
@@ -90,6 +90,7 @@ def findError6278(fileName, errorFile):
 #             #clear the varList
 #             print ("!")
 #     F.close()
+
 # ##warning #7319: This argument's data type is incompatible with this intrinsic procedure; procedure assumed EXTERNAL.
 # def findError7319(fileName, errorFile):
 #     F = open(errorFile, 'a')
@@ -308,7 +309,6 @@ def findError6186(fileName, errorFile):
     print("[Complete]")
 
 # assumption for only the general cases
-#
 ## I to N --> INT
 ## OTHER  --> REAL
 # checks if there is an undeclared variable in the file
@@ -334,6 +334,7 @@ def findError6404(fileName, errorFile, fileLocation):
     ext_hasIdentifier = False
     hasQuote = False
     hasDblQuote = False
+    initTime = time.time() ## COMMENT OUT LATER
 
     USE_REGEX = re.compile(r'[ ]*USE([, ]+INTRINSIC)?[ :]+([a-z0-9_]*)([, ]+ONLY[ :]+)?', re.I)
     INCLUDE_REGEX = re.compile(r'[ ]*INCLUDE[ :]*[\'\"]([^\'\"]*)', re.I)
@@ -357,7 +358,7 @@ def findError6404(fileName, errorFile, fileLocation):
         'IMPLICIT', 'NONE', 'STAT', 'INDEX', 'REWIND','C']
     ### TODO: FUNCTION KEYS FROM NOTEPAD++, THIS SHOULD BE A THOROUGH LIST OF INTRINSIC FUNCTIONS
     ##        DOESNT HAVE ALL THE OBSOLETE FUNCTIONS SUCH AS INUM, JNUM, KNUM, ...
-    reservedNotepadKey = ['__FILE__', '__LINE__', '__DATE__', '__TIME__', '__TIMESTAMP__', 'ABS', 'ACCESS', 'ACHAR', 'ACOS', 'ACOSD', 'ACTION', 'ADJUSTL', 'ADJUSTR', 'ADVANCE', 'AIMAG', 'AIMAX0', 'AIMIN0', 'AINT', 'AJMAX0', 'AJMIN0', 'AKMAX0', 'AKMIN0', 'ALL', 'ALLOCATABLE', 'ALLOCATE', 'ALLOCATED', 'ALOG', 'ALOG10', 'AMAX0', 'AMAX1', 'AMIN0', 'AMIN1', 'AMOD', 'ANINT', 'ANY', 'APOSTROPHE', 'ASIN', 'ASIND', 'ASSIGN', 'ASSIGNMENT', 'ASSOCIATE', 'ASSOCIATED', 'ASYNCHRONOUS', 'ATAN', 'ATAN2', 'ATAN2D', 'ATAND', 'BACKSPACE', 'BIND', 'BIT_SIZE', 'BITEST', 'BITL', 'BITLR', 'BITRL', 'BJTEST', 'BKTEST', 'BLANK', 'BLOCKDATA', 'BREAK', 'BTEST', 'CABS', 'CALL', 'CASE', 'CCOS', 'CDABS', 'CDABS', 'CDCOS', 'CDCOS', 'CDEXP', 'CDEXP', 'CDLOG', 'CDLOG', 'CDSIN', 'CDSIN', 'CDSQRT', 'CDSQRT', 'CEILING', 'CEXP', 'CHAR', 'CHARACTER', 'CLASS', 'CLOG', 'CLOSE', 'CMPLX', 'COMMON', 'COMPLEX', 'CONJG', 'CONTAINS', 'CONTINUE', 'COS', 'COSD', 'COSH', 'COTAN', 'COTAND', 'COUNT', 'CPU_TIME', 'CRITICAL', 'CSHIFT', 'CSIN', 'CSQRT', 'CYCLE', 'DABS', 'DACOS', 'DACOSD', 'DASIN', 'DASIND', 'DATA', 'DATAN', 'DATAN2', 'DATAN2D', 'DATAND', 'DATE', 'DATE_AND_TIME', 'DBLE', 'DCMPLX', 'DCMPLX', 'DCONJG', 'DCONJG', 'DCOS', 'DCOSD', 'DCOSH', 'DCOTAN', 'DCOTAN', 'DCOTAND', 'DDIM', 'DEALLOCATE', 'DECIMAL', 'DECODE', 'DEFAULT', 'DELIM', 'DEXP', 'DFLOAT', 'DFLOTI', 'DFLOTJ', 'DFLOTK', 'DIGITS', 'DIM', 'DIMAG', 'DIMAG', 'DIMENSION', 'DINT', 'DIRECT', 'DLL_EXPORT', 'DLL_IMPORT', 'DLOG', 'DLOG10', 'DMAX1', 'DMIN1', 'DMOD', 'DNINT', 'DO', 'DOT_PRODUCT', 'DOUBLE', 'DOUBLECOMPLEX', 'DOUBLEPRECISION', 'DOWHILE', 'DPROD', 'DREAL', 'DREAL', 'DSIGN', 'DSIN', 'DSIND', 'DSINH', 'DSQRT', 'DTAN', 'DTAND', 'DTANH', 'DVCHK', 'ELSE', 'ELSEIF', 'ELSEWHERE', 'ENCODE', 'ENCODING', 'END', 'ENDASSOCIATE', 'ENDBLOCKDATA', 'ENDCRITICAL', 'ENDDO', 'ENDENUM', 'ENDFILE', 'ENDFORALL', 'ENDFUNCTION', 'ENDIF', 'ENDINTERFACE', 'ENDMODULE', 'ENDPROCEDURE', 'ENDPROGRAM', 'ENDSELECT', 'ENDSUBMODULE', 'ENDSUBROUTINE', 'ENDTYPE', 'ENDWHERE', 'ENTRY', 'ENUM', 'EOR', 'EOSHIFT', 'EPSILON', 'EQUIVALENCE', 'ERR', 'ERRMSG', 'ERRSNS', 'EXIST', 'EXIT', 'EXP', 'EXPONENT', 'EXTERNAL', 'FILE', 'FIND', 'FLEN', 'FLOAT', 'FLOATI', 'FLOATJ', 'FLOATK', 'FLOOR', 'FLUSH', 'FLUSH', 'FMT', 'FORALL', 'FORM', 'FORMAT', 'FORMATTED', 'FRACTION', 'FREE', 'FUNCTION', 'GETARG', 'GETCHARQQ', 'GETCL', 'GETDAT', 'GETENV', 'GETTIM', 'GO', 'GOTO', 'HFIX', 'HUGE', 'IABS', 'IACHAR', 'IAND', 'IBCHNG', 'IBCLR', 'IBITS', 'IBSET', 'ICHAR', 'ID', 'IDATE', 'IDENTIFIER', 'IDIM', 'IDINT', 'IDNINT', 'IEOR', 'IF', 'IFIX', 'IIABS', 'IIAND', 'IIBCLR', 'IIBITS', 'IIBSET', 'IIDIM', 'IIDINT', 'IIDNNT', 'IIEOR', 'IIFIX', 'IINT', 'IIOR', 'IIQINT', 'IIQNNT', 'IISHFT', 'IISHFTC', 'IISIGN', 'ILEN', 'IMAG', 'IMAX0', 'IMAX1', 'IMIN0', 'IMIN1', 'IMOD', 'IMPLICIT', 'IN', 'INCLUDE', 'INDEX', 'ININT', 'INOT', 'INOUT', 'INQUIRE', 'INT', 'INT1', 'INT1', 'INT2', 'INT2', 'INT4', 'INT4', 'INT8', 'INTC', 'INTEGER', 'INTENT', 'INTERFACE', 'INTRINSIC', 'INTRUP', 'INVALOP', 'IOLENGTH', 'IOMSG', 'IOR', 'IOSTAT', 'IOSTAT_MSG', 'IQINT', 'IQNINT', 'ISHA', 'ISHC', 'ISHFT', 'ISHFTC', 'ISHL', 'ISIGN', 'ISNAN', 'IZEXT', 'JFIX', 'JIAND', 'JIBCLR', 'JIBITS', 'JIBSET', 'JIDIM', 'JIDINT', 'JIDNNT', 'JIEOR', 'JIFIX', 'JINT', 'JIOR', 'JIQINT', 'JIQNNT', 'JISHFT', 'JISHFTC', 'JISIGN', 'JMAX0', 'JMAX1', 'JMIN0', 'JMIN1', 'JMOD', 'JNINT', 'JNOT', 'JZEXT', 'KIABS', 'KIAND', 'KIBCLR', 'KIBITS', 'KIBSET', 'KIDIM', 'KIDINT', 'KIDNNT', 'KIEOR', 'KIFIX', 'KIND', 'KIND', 'KINT', 'KIOR', 'KISHFT', 'KISHFTC', 'KISIGN', 'KMAX0', 'KMAX1', 'KMIN0', 'KMIN1', 'KMOD', 'KNINT', 'KNOT', 'KZEXT', 'LACFAR', 'LBOUND', 'LEADZ', 'LEN', 'LEN', 'LEN_TRIM', 'LENLGE', 'LGE', 'LGT', 'LLE', 'LLT', 'LOCKING', 'LOCNEAR', 'LOG', 'LOG10', 'LOGICAL', 'LOGICAL', 'LSHIFT', 'MALLOC', 'MAP', 'MATMUL', 'MAX', 'MAX0', 'MAX1', 'MAXEXPONENT', 'MAXLOC', 'MAXVAL', 'MERGE', 'MIN', 'MIN0', 'MIN1', 'MINEXPONENT', 'MINLOC', 'MINVAL', 'MOD', 'MODULE', 'MODULO', 'MVBITS', 'NAME', 'NAMED', 'NAMELIST', 'NARGS', 'NBREAK', 'NDPERR', 'NDPEXC', 'NEAREST', 'NEXTREC', 'NINT', 'NML', 'NONE', 'NOT', 'NULLIFY', 'NUMBER', 'NUMBER_OF_PROCESSORS', 'NWORKERS', 'OFFSET', 'ONLY', 'OPEN', 'OPENED', 'OPERATOR', 'OPTIONAL', 'OUT', 'OVEFL', 'PACK', 'PAD', 'PARAMETER', 'PASS', 'PAUSE', 'PEEKCHARQQ', 'PENDING', 'POINTER', 'POPCNT', 'POPPAR', 'POS', 'POSITION', 'PRECFILL', 'PRECISION', 'PRECISION', 'PRESENT', 'PRINT', 'PRIVATE', 'PROCEDURE', 'PRODUCT', 'PROGRAM', 'PROMPT', 'PROTECTED', 'PUBLIC', 'QABS', 'QACOS', 'QACOSD', 'QASIN', 'QASIND', 'QATAN', 'QATAN2', 'QATAND', 'QCMPLX', 'QCONJG', 'QCOS', 'QCOSD', 'QCOSH', 'QDIM', 'QEXP', 'QEXT', 'QEXTD', 'QFLOAT', 'QIMAG', 'QLOG', 'QLOG10', 'QMAX1', 'QMIN1', 'QMOD', 'QREAL', 'QSIGN', 'QSIN', 'QSIND', 'QSINH', 'QSQRT', 'QTAN', 'QTAND', 'QTANH', 'QUOTE', 'RADIX', 'RAN', 'RAND', 'RANDOM', 'RANDOM_NUMBER', 'RANDOM_SEED', 'RANDU', 'RANGE', 'READ', 'READWRITE', 'REAL', 'REAL', 'REC', 'RECL', 'RECURSIVE', 'REPEAT', 'RESHAPE', 'RESULT', 'RETURN', 'RETURN1', 'REWIND', 'REWRITE', 'RRSPACING', 'RSHIFT', 'SAVE', 'SCALE', 'SCAN', 'SECNDS', 'SEGMENT', 'SELECT', 'SELECTCASE', 'SELECTED_INT_KIND', 'SELECTED_REAL_KIND', 'SELECTTYPE', 'SEQUENTIAL', 'SET_EXPONENT', 'SETDAT', 'SETTIM', 'SEQUENCE', 'SHAPE', 'SIGN', 'SIGN', 'SIN', 'SIND', 'SINH', 'SIZE', 'SIZE', 'SIZEOF', 'SNGL', 'SNGLQ', 'SPACING', 'SPREAD', 'SQRT', 'STAT', 'STATUS', 'STOP', 'STREAM', 'SUBMODULE', 'SUBROUTINE', 'SUM', 'SYSTEM', 'SYSTEM_CLOCK', 'TAN', 'TAND', 'TANH', 'TARGET', 'THEN', 'TIMER', 'TINY', 'TO', 'TRANSFER', 'TRANSPOSE', 'TRIM', 'TYPE', 'UBOUND', 'UNDFL', 'UNFORMATTED', 'UNION', 'UNIT', 'UNLOCK', 'UNPACK', 'USE', 'VAL', 'VALUE', 'VERIFY', 'VIRTUAL', 'VOLATILE', 'VOLATILE', 'WAIT', 'WHERE', 'WHILE', 'WRITE', 'ZABS', 'ZCOS', 'ZEXP', 'ZLOG', 'ZSIN', 'ZSQRT']
+    reservedNotepadKey = ['__FILE__', '__LINE__', '__DATE__', '__TIME__', '__TIMESTAMP__', 'ABS', 'ACCESS', 'ACHAR', 'ACOS', 'ACOSD', 'ACTION', 'ADJUSTL', 'ADJUSTR', 'ADVANCE', 'AIMAG', 'AIMAX0', 'AIMIN0', 'AINT', 'AJMAX0', 'AJMIN0', 'AKMAX0', 'AKMIN0', 'ALL', 'ALLOCATABLE', 'ALLOCATE', 'ALLOCATED', 'ALOG', 'ALOG10', 'AMAX0', 'AMAX1', 'AMIN0', 'AMIN1', 'AMOD', 'ANINT', 'ANY', 'APOSTROPHE', 'ASIN', 'ASIND', 'ASSIGN', 'ASSIGNMENT', 'ASSOCIATE', 'ASSOCIATED', 'ASYNCHRONOUS', 'ATAN', 'ATAN2', 'ATAN2D', 'ATAND', 'BACKSPACE', 'BIND', 'BIT_SIZE', 'BITEST', 'BITL', 'BITLR', 'BITRL', 'BJTEST', 'BKTEST', 'BLANK', 'BLOCKDATA', 'BREAK', 'BTEST','CABS', 'CALL', 'CASE', 'CCOS', 'CDABS', 'CDABS', 'CDCOS', 'CDCOS', 'CDEXP', 'CDEXP', 'CDLOG', 'CDLOG', 'CDSIN', 'CDSIN', 'CDSQRT', 'CDSQRT', 'CEILING', 'CEXP', 'CHAR', 'CHARACTER', 'CLASS', 'CLOG', 'CLOSE', 'CMPLX', 'COMMON', 'COMPLEX', 'CONJG', 'CONTAINS', 'CONTINUE', 'COS', 'COSD', 'COSH', 'COTAN', 'COTAND', 'COUNT', 'CPU_TIME', 'CRITICAL', 'CSHIFT', 'CSIN', 'CSQRT', 'CYCLE', 'DABS', 'DACOS', 'DACOSD', 'DASIN', 'DASIND', 'DATA', 'DATAN', 'DATAN2', 'DATAN2D', 'DATAND', 'DATE', 'DATE_AND_TIME', 'DBLE', 'DCMPLX', 'DCMPLX', 'DCONJG', 'DCONJG', 'DCOS', 'DCOSD', 'DCOSH', 'DCOTAN', 'DCOTAN', 'DCOTAND', 'DDIM', 'DEALLOCATE', 'DECIMAL', 'DECODE', 'DEFAULT', 'DELIM', 'DEXP', 'DFLOAT', 'DFLOTI', 'DFLOTJ', 'DFLOTK', 'DIGITS', 'DIM', 'DIMAG', 'DIMAG', 'DIMENSION', 'DINT', 'DIRECT', 'DLL_EXPORT', 'DLL_IMPORT', 'DLOG', 'DLOG10', 'DMAX1', 'DMIN1', 'DMOD', 'DNINT', 'DO', 'DOT_PRODUCT', 'DOUBLE', 'DOUBLECOMPLEX', 'DOUBLEPRECISION', 'DOWHILE', 'DPROD', 'DREAL', 'DREAL', 'DSIGN', 'DSIN', 'DSIND', 'DSINH', 'DSQRT', 'DTAN', 'DTAND', 'DTANH', 'DVCHK', 'ELSE', 'ELSEIF', 'ELSEWHERE', 'ENCODE', 'ENCODING', 'END', 'ENDASSOCIATE', 'ENDBLOCKDATA', 'ENDCRITICAL', 'ENDDO', 'ENDENUM', 'ENDFILE', 'ENDFORALL', 'ENDFUNCTION', 'ENDIF', 'ENDINTERFACE', 'ENDMODULE', 'ENDPROCEDURE', 'ENDPROGRAM', 'ENDSELECT', 'ENDSUBMODULE', 'ENDSUBROUTINE', 'ENDTYPE', 'ENDWHERE', 'ENTRY', 'ENUM', 'EOR', 'EOSHIFT', 'EPSILON', 'EQUIVALENCE', 'ERR', 'ERRMSG', 'ERRSNS', 'EXIST', 'EXIT', 'EXP', 'EXPONENT', 'EXTERNAL', 'FILE', 'FIND', 'FLEN', 'FLOAT', 'FLOATI', 'FLOATJ', 'FLOATK', 'FLOOR', 'FLUSH', 'FLUSH', 'FMT', 'FORALL', 'FORM', 'FORMAT', 'FORMATTED', 'FRACTION', 'FREE', 'FUNCTION', 'GETARG', 'GETCHARQQ', 'GETCL', 'GETDAT', 'GETENV', 'GETTIM', 'GO', 'GOTO', 'HFIX', 'HUGE', 'IABS', 'IACHAR', 'IAND', 'IBCHNG', 'IBCLR', 'IBITS', 'IBSET', 'ICHAR', 'ID', 'IDATE', 'IDENTIFIER', 'IDIM', 'IDINT', 'IDNINT', 'IEOR', 'IF', 'IFIX', 'IIABS', 'IIAND', 'IIBCLR', 'IIBITS', 'IIBSET', 'IIDIM', 'IIDINT', 'IIDNNT', 'IIEOR', 'IIFIX', 'IINT', 'IIOR', 'IIQINT', 'IIQNNT', 'IISHFT', 'IISHFTC', 'IISIGN', 'ILEN', 'IMAG', 'IMAX0', 'IMAX1', 'IMIN0', 'IMIN1', 'IMOD', 'IMPLICIT', 'IN', 'INCLUDE', 'INDEX', 'ININT', 'INOT', 'INOUT', 'INQUIRE', 'INT', 'INT1', 'INT1', 'INT2', 'INT2', 'INT4', 'INT4', 'INT8', 'INTC', 'INTEGER', 'INTENT', 'INTERFACE', 'INTRINSIC', 'INTRUP', 'INVALOP', 'IOLENGTH', 'IOMSG', 'IOR', 'IOSTAT', 'IOSTAT_MSG', 'IQINT', 'IQNINT', 'ISHA', 'ISHC', 'ISHFT', 'ISHFTC', 'ISHL', 'ISIGN', 'ISNAN', 'IZEXT', 'JFIX', 'JIAND', 'JIBCLR', 'JIBITS', 'JIBSET', 'JIDIM', 'JIDINT', 'JIDNNT', 'JIEOR', 'JIFIX', 'JINT', 'JIOR', 'JIQINT', 'JIQNNT', 'JISHFT', 'JISHFTC', 'JISIGN', 'JMAX0', 'JMAX1', 'JMIN0', 'JMIN1', 'JMOD', 'JNINT', 'JNOT', 'JZEXT', 'KIABS', 'KIAND', 'KIBCLR', 'KIBITS', 'KIBSET', 'KIDIM', 'KIDINT', 'KIDNNT', 'KIEOR', 'KIFIX', 'KIND', 'KIND', 'KINT', 'KIOR', 'KISHFT', 'KISHFTC', 'KISIGN', 'KMAX0', 'KMAX1', 'KMIN0', 'KMIN1', 'KMOD', 'KNINT', 'KNOT', 'KZEXT', 'LACFAR', 'LBOUND', 'LEADZ', 'LEN', 'LEN', 'LEN_TRIM', 'LENLGE', 'LGE', 'LGT', 'LLE', 'LLT', 'LOCKING', 'LOCNEAR', 'LOG', 'LOG10', 'LOGICAL', 'LOGICAL', 'LSHIFT', 'MALLOC', 'MAP', 'MATMUL', 'MAX', 'MAX0', 'MAX1', 'MAXEXPONENT', 'MAXLOC', 'MAXVAL', 'MERGE', 'MIN', 'MIN0', 'MIN1', 'MINEXPONENT', 'MINLOC', 'MINVAL', 'MOD', 'MODULE', 'MODULO', 'MVBITS', 'NAME', 'NAMED', 'NAMELIST', 'NARGS', 'NBREAK', 'NDPERR', 'NDPEXC', 'NEAREST', 'NEXTREC', 'NINT', 'NML', 'NONE', 'NOT', 'NULLIFY', 'NUMBER', 'NUMBER_OF_PROCESSORS', 'NWORKERS', 'OFFSET', 'ONLY', 'OPEN', 'OPENED', 'OPERATOR', 'OPTIONAL', 'OUT', 'OVEFL', 'PACK', 'PAD', 'PARAMETER', 'PASS', 'PAUSE', 'PEEKCHARQQ', 'PENDING', 'POINTER', 'POPCNT', 'POPPAR', 'POS', 'POSITION', 'PRECFILL', 'PRECISION', 'PRECISION', 'PRESENT', 'PRINT', 'PRIVATE', 'PROCEDURE', 'PRODUCT', 'PROGRAM', 'PROMPT', 'PROTECTED', 'PUBLIC', 'QABS', 'QACOS', 'QACOSD', 'QASIN', 'QASIND', 'QATAN', 'QATAN2', 'QATAND', 'QCMPLX', 'QCONJG', 'QCOS', 'QCOSD', 'QCOSH', 'QDIM', 'QEXP', 'QEXT', 'QEXTD', 'QFLOAT', 'QIMAG', 'QLOG', 'QLOG10', 'QMAX1', 'QMIN1', 'QMOD', 'QREAL', 'QSIGN', 'QSIN', 'QSIND', 'QSINH', 'QSQRT', 'QTAN', 'QTAND', 'QTANH', 'QUOTE', 'RADIX', 'RAN', 'RAND', 'RANDOM', 'RANDOM_NUMBER', 'RANDOM_SEED', 'RANDU', 'RANGE', 'READ', 'READWRITE', 'REAL', 'REAL', 'REC', 'RECL', 'RECURSIVE', 'REPEAT', 'RESHAPE', 'RESULT', 'RETURN', 'RETURN1', 'REWIND', 'REWRITE', 'RRSPACING', 'RSHIFT', 'SAVE', 'SCALE', 'SCAN', 'SECNDS', 'SEGMENT', 'SELECT', 'SELECTCASE', 'SELECTED_INT_KIND', 'SELECTED_REAL_KIND', 'SELECTTYPE', 'SEQUENTIAL', 'SET_EXPONENT', 'SETDAT', 'SETTIM', 'SEQUENCE', 'SHAPE', 'SIGN', 'SIGN', 'SIN', 'SIND', 'SINH', 'SIZE', 'SIZE', 'SIZEOF', 'SNGL', 'SNGLQ', 'SPACING', 'SPREAD', 'SQRT', 'STAT', 'STATUS', 'STOP', 'STREAM', 'SUBMODULE', 'SUBROUTINE', 'SUM', 'SYSTEM', 'SYSTEM_CLOCK', 'TAN', 'TAND', 'TANH', 'TARGET', 'THEN', 'TIMER', 'TINY', 'TO', 'TRANSFER', 'TRANSPOSE', 'TRIM', 'TYPE', 'UBOUND', 'UNDFL', 'UNFORMATTED', 'UNION', 'UNIT', 'UNLOCK', 'UNPACK', 'USE', 'VAL', 'VALUE', 'VERIFY', 'VIRTUAL', 'VOLATILE', 'VOLATILE', 'WAIT', 'WHERE', 'WHILE', 'WRITE', 'ZABS', 'ZCOS', 'ZEXP', 'ZLOG', 'ZSIN', 'ZSQRT']
     ##compiler directives, not used
     reservedCD = ['ALIAS', 'ASSUME_ALIGNED', 'ATTRIBUTES', 'DECLARE', 'DEFINE', 'DISTRIBUTE POINT', 'ELSE', 'ELSEIF', 'ENDIF', \
         'FIXEDFORMLINESIZE', 'FREEFORM', 'IDENT', 'IF', 'IF DEFINED', 'INTEGER', 'IVDEP', 'LOOP COUNT', 'MEMREF_CONTROL', 'MESSAGE', 'NODECLARE' \
@@ -466,8 +467,6 @@ def findError6404(fileName, errorFile, fileLocation):
         elif 'FUNCTION' in newLine.upper():
             functionIndex1 = newLine.upper().find('FUNCTION ')
             functionIndex2 = newLine.upper().find('(')
-            # varList = []
-            # exList = []
             hasImplicit = False
             varList.append(newLine[functionIndex1+9:functionIndex2].strip().upper())
             if newLine.endswith(',\n'):
@@ -532,8 +531,6 @@ def findError6404(fileName, errorFile, fileLocation):
                 hasIdentifier = True
                 newLine = newLine.strip()
                 newLine = newLine[len(reservedIdentifier[ii])-0:]
-                # newLine = re.search(r"\s+(\w+)", newLine)
-                # newLine = newLine.match(1)
 
 
         # print ("H: " + str(hasIdentifier) + " exH: " + str(ext_hasIdentifier))
@@ -546,10 +543,11 @@ def findError6404(fileName, errorFile, fileLocation):
         ##          DIMENSION :: TSOP
         if hasIdentifier and '::' in newLine:
             newLine = newLine[newLine.find('::')+2:]
+
+        ##remove FORMAT FUNCTION
         if "FORMAT" in newLine.upper(): ## or re.search(r'\b'+ 'WRITE[ ]*\(', newLine.upper()):
             isFormat = True
             continue
-        ##continuation line for format
         elif isFormat and len(newLine) > 5 and \
             not ' ' in newLine[5]:
                 continue
@@ -609,7 +607,7 @@ def findError6404(fileName, errorFile, fileLocation):
                         if newLine[cIndex] == '(':
                             cIndex = j
             newLine = newLine1
-
+        # print("Time taken by functions: " + str(time.time()- initTime) +"s function skip block" + fileName)
         ## strips brackets that expands over multiple lines\
         ## FIXED WITH ABOVE LOOP
         ##issues:
@@ -621,118 +619,45 @@ def findError6404(fileName, errorFile, fileLocation):
         #     newLine = newLine[:newLine.rfind(' ')+1] + newLine[newLine.find('(')+1:]
 
         newLine = re.sub('[^a-zA-Z0-9\n\.\_]', ',', newLine.strip())
-        # print (newLine)
-        ## CALL with space boundary, not needed probably
-        # if re.search('r\b' + 'CALL' +r'\b', newLine.upper()):
-            # print (newLine)
+        if newLine.startswith(',') or newLine.endswith(','):
+            newLine = re.sub(',+', ',', newLine).strip(',')
+        else:
+            newLine = re.sub(',+', ',', newLine)
+        newList = newLine.split(',')
 
-        ## ignore CALL function
-        ##hotfix with single call functions
-        ##          CALL FUNCT1
-        ##cleans up
-        if newLine.upper().startswith('CALL,') and newLine.count(',')==1:
+        if ('CALL' in newList or 'call' in newList) and \
+            len(newList) == 1:
             continue
-        ##assuming the CALL SUB1 name is removed already
-        elif newLine.upper().startswith('CALL,') and newLine.count(',')>1:
-            newLine = newLine[5:]
-            continue
-        ##assuming the CALL SUB1 name is removed already
-        ##clean up IF FUNCT1(CALL SUBR1)
-        ##      -->IF FUNCT1(CALL
-        elif ',CALL,' in newLine.upper() and newLine[newLine.upper().find(',CALL,')+1:].count(',')>1:
-            newLine = newLine[newLine.upper().find(',CALL,')+1:newLine.find(')')]
-        elif ',CALL,' in newLine.upper():
-            newLine = newLine[:newLine.find(',CALL,')]
-
-        ## while newLine begins/end with ',' truncate the line
-        ## truncating   ,,,,,,this,is,the,statement,,,,,,,,
-        ## -->                this,is,the,statement
-        while(newLine.startswith(',')):
-            newLine = newLine[1::]
-        while(newLine.endswith(',')):
-            newLine = newLine[:-1]
-
-        LeftIndex4 = 0
-        RightIndex4 = 0
-        # ## TEST FUNCTION
-        # if (hasIdentifier or ext_hasIdentifier):
-        #     print (newLine + "<-----VARIABLE ")
-        # else:
-        # print (newLine + "<-----line")
+        elif 'CALL' in newList:
+            newList.pop(newList.index('CALL')+1)
+        elif 'call' in newList:
+            newList.pop(newList.index('call')+1)
+        # if len(newList) == 2 and newList[0].upper() == 'CALL':
+        #     continue
     ##CHECKS IF VARIABLE WAS PREVIOUSLY DECLARED, MAIN FUNCTION OF ERROR6404
-        while(LeftIndex4 != -1):
-            if newLine =='':
-                     break
-            elif(LeftIndex4 == 0 and RightIndex4 == 0):
-                RightIndex4 = newLine.find(',')
-            elif (LeftIndex4 != -1 and RightIndex4 == -1):
-                RightIndex4 = len(newLine)
-            #single variables ex. END
-            if LeftIndex4 ==0 and RightIndex4 == -1:
-                # print (newLine[LeftIndex4:])
-                if (hasIdentifier or ext_hasIdentifier) and \
-                    not newLine[LeftIndex4:].upper() in varList and \
-                    newLine[LeftIndex4:].isidentifier():
-                        varList.append(newLine[LeftIndex4:].upper())
-                if not newLine[LeftIndex4:].upper() in reservedList and \
-                    not newLine[LeftIndex4:].upper() in reservedIdentifier and \
-                    not newLine[LeftIndex4:].upper() in reservedVarOption and \
-                    not newLine[LeftIndex4:].upper() in reservedSpecialCase and \
-                    not newLine[LeftIndex4:].upper() in reservedNotepadKey and \
-                    not newLine[LeftIndex4:].upper() in reservedOPSpecifiers and \
-                    not newLine[LeftIndex4:].upper() in varList and\
-                    not newLine[LeftIndex4:].upper() in exList and\
-                    not newLine[LeftIndex4:].upper() in prevVar and\
-                    newLine[LeftIndex4:].isidentifier():
-                    # prevVar != newLine[LeftIndex4:].upper() and\   ## remove the repeating variables if error was found; it might have conflicting
-                    #                                                   results if a subroutine is between the variables
-                    # newLine[LeftIndex4:].isidentifier():
-                        prevVar.append(newLine[LeftIndex4:])
-                        # print (prevVar)
-                        F.write(newFileName + "(" + str(i+1) + ") error #6404: [" + newLine[LeftIndex4:] + "] \n")
-                        F.flush()
-            elif LeftIndex4 == 0:
-                # print (newLine[LeftIndex4:RightIndex4])
-                if (hasIdentifier or ext_hasIdentifier) and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in varList and \
-                    newLine[LeftIndex4:RightIndex4].isidentifier():
-                        varList.append(newLine[LeftIndex4:RightIndex4].upper())
-                if not newLine[LeftIndex4:RightIndex4].upper() in reservedList and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in reservedIdentifier and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in reservedVarOption and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in reservedSpecialCase and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in reservedNotepadKey and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in reservedOPSpecifiers and \
-                    not newLine[LeftIndex4:RightIndex4].upper() in varList and\
-                    not newLine[LeftIndex4:RightIndex4].upper() in exList and\
-                    not newLine[LeftIndex4:RightIndex4].upper() in prevVar and\
-                    newLine[LeftIndex4:RightIndex4].isidentifier():
-                        prevVar.append(newLine[LeftIndex4:RightIndex4])
-                        F.write(newFileName + "(" + str(i+1) + ") error #6404: [" + newLine[LeftIndex4:RightIndex4] + "] \n")
-                        F.flush()
-            #middle and last variables
-            else:
-                # print (newLine[LeftIndex4+1:RightIndex4]+"!")
-                if (hasIdentifier or ext_hasIdentifier) and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in varList and \
-                    newLine[LeftIndex4+1:RightIndex4].isidentifier():
-                        varList.append(newLine[LeftIndex4+1:RightIndex4].upper())
-                if not newLine[LeftIndex4+1:RightIndex4].upper() in reservedList and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in reservedIdentifier and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in reservedVarOption and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in reservedSpecialCase and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in reservedNotepadKey and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in reservedOPSpecifiers and \
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in varList and\
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in exList and\
-                    not newLine[LeftIndex4+1:RightIndex4].upper() in prevVar and\
-                    newLine[LeftIndex4+1:RightIndex4].isidentifier():
-                        prevVar.append(newLine[LeftIndex4+1:RightIndex4])
-                        F.write(newFileName + "(" + str(i+1) + ") error #6404: [" + newLine[LeftIndex4+1:RightIndex4] + "] \n")
-                        F.flush()
-            LeftIndex4 = newLine.find(',', LeftIndex4 + 1)
-            RightIndex4 = newLine.find(',', LeftIndex4 + 1)
+        # print("Time taken by functions: " + str(time.time()- initTime) +"s prevariable check block")
 
+        if newList:
+            for ii in newList:
+                if (hasIdentifier or ext_hasIdentifier) and \
+                    ii.upper() not in varList and \
+                    ii.isidentifier():
+                        varList.append(ii.upper())
+                if not ii.upper() in reservedList and \
+                    not ii.upper() in reservedIdentifier and \
+                    not ii.upper() in reservedNotepadKey and \
+                    not ii.upper() in reservedVarOption and \
+                    not ii.upper() in reservedSpecialCase and \
+                    not ii.upper() in reservedOPSpecifiers and \
+                    not ii.upper() in prevVar and \
+                    not ii.upper() in varList and \
+                    not ii.upper() in exList and \
+                    ii.isidentifier():
+                        prevVar.append(ii.upper())
+                        F.write(newFileName + '(' + str(i+1) + ') error #6404: ['+ ii + '] \n')
+                        F.flush()
+
+    # print("Time taken by functions: " + str(time.time()- initTime) +"s post variable check block")
     print("[Complete]")
     F.close()
 
