@@ -15,10 +15,10 @@ def buildTxtFile(fileText, fileLocation):
     # initTime = time.time()
     for filename in glob.iglob(fileLocation + "*.f*"):
         if filename.endswith('.f') or filename.endswith('.for') or filename.endswith('.f90'):
-            # findError6186(filename, fileText)
-            # findError6222(filename, fileText)
-            # findError6278(filename, fileText)
-            # findError6418(filename, fileText)
+            findError6186(filename, fileText)
+            findError6222(filename, fileText)
+            findError6278(filename, fileText)
+            findError6418(filename, fileText)
             if not filename.endswith('*.f') and not '.f90' in filename:
                 findError6404(filename, fileText, fileLocation)
 
@@ -625,6 +625,7 @@ def findError6404(fileName, errorFile, fileLocation):
             newLine = re.sub(',+', ',', newLine)
         newList = newLine.split(',')
 
+        ##removes the CALL function names
         if ('CALL' in newList or 'call' in newList) and \
             len(newList) == 1:
             continue
